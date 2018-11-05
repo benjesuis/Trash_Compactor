@@ -1,5 +1,5 @@
 # Trash_Compactor
 
-EK210 Section E1\n
-Team Bronze\n
-Trash Compactor\n
+EK210 Section E1  
+Team Bronze  
+Trash Compactor  
