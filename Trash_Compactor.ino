@@ -64,6 +64,9 @@ void poll() {
 void compact() {
   digitalWrite(motorPin, HIGH);
   digitalWrite(lockPin, HIGH);
+  if (analogRead(switchIn) < 200) {
+    switched = false;
+  }
 }
 
 void reset() {
