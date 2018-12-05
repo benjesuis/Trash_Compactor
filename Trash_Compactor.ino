@@ -6,8 +6,8 @@
 */
 
 #include <HX711.h>
-const int valvePin = 6;
-const int lockPin = 5;
+const int valvePin = 3;
+const int lockPin = 6;
 const int distPin = A0;
 const int switchOut = A1;
 const int switchIn = A2;
@@ -16,6 +16,7 @@ HX711 scale(3, 2);
 
 int distance;
 bool switched;
+bool justCompacted;
 
 void checkDistance();
 void checkSwitch();
@@ -23,7 +24,9 @@ void checkTension();
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Initializing...");
   switched = false;
+  justCompacted = false;
   distance = -1;
   pinMode(valvePin, OUTPUT);
   pinMode(lockPin, OUTPUT);
@@ -33,31 +36,37 @@ void setup() {
 
 void loop() {
   analogWrite(switchOut, 255);
-  if(analogRead(switchIn) > 1010) {
+  //Serial.println(analogRead(switchIn));
+  if(analogRead(switchIn) > 900) {
     switched = true;
   } else {
     switched = false;
   }
-  checkDistance();
+  //checkDistance();
   while(switched) {
     digitalWrite(lockPin, HIGH);
-    if(analogRead(switchIn) > 1010) {
+    Serial.println(analogRead(switchIn));
+    if(analogRead(switchIn) > 900) {
       switched = true;
     } else {
       switched = false;
     }
     //checkTension();
     // motor gets turned on here externally
+    justCompacted = true;
   }
-  digitalWrite(valvePin, HIGH);
-  delay(1000 * 2.5);
-  digitalWrite(lockPin, LOW);
-  digitalWrite(valvePin, LOW);
-  analogWrite(led, 0);
+  if (justCompacted) {
+    digitalWrite(valvePin, HIGH);
+    delay(1000);
+    digitalWrite(lockPin, LOW);
+    digitalWrite(valvePin, LOW);
+    analogWrite(led, 0);
+    justCompacted = false;
+  }
 }
 
 void checkSwitch() {
-  Serial.println(analogRead(switchIn));
+  //Serial.println(analogRead(switchIn));
   switched = analogRead(switchIn > 1010) ? true : false;
   //Serial.println(switched);
 }
