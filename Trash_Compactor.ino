@@ -9,9 +9,8 @@
 const int valvePin = 3;
 const int lockPin = 6;
 const int distPin = A0;
-const int switchOut = A1;
-const int switchIn = A2;
-const int led = A3;
+const int controlsSwitch = 10;
+const int led = 2;
 HX711 scale(3, 2);
 
 int distance;
@@ -30,14 +29,15 @@ void setup() {
   distance = -1;
   pinMode(valvePin, OUTPUT);
   pinMode(lockPin, OUTPUT);
+  pinMode(led, OUTPUT);
+  pinMode(controlsSwitch, INPUT_PULLUP);
   scale.set_scale();
   scale.tare();
 }
 
 void loop() {
-  analogWrite(switchOut, 255);
   //Serial.println(analogRead(switchIn));
-  if(analogRead(switchIn) > 900) {
+  if(digitalRead(controlsSwitch) == HIGH) {
     switched = true;
   } else {
     switched = false;
@@ -45,8 +45,7 @@ void loop() {
   //checkDistance();
   while(switched) {
     digitalWrite(lockPin, HIGH);
-    Serial.println(analogRead(switchIn));
-    if(analogRead(switchIn) > 900) {
+    if(digitalRead(controlsSwitch) == HIGH) {
       switched = true;
     } else {
       switched = false;
@@ -57,26 +56,20 @@ void loop() {
   }
   if (justCompacted) {
     digitalWrite(valvePin, HIGH);
-    delay(1000);
+    delay(1000 * 10);
     digitalWrite(lockPin, LOW);
     digitalWrite(valvePin, LOW);
-    analogWrite(led, 0);
+    digitalWrite(led, LOW);
     justCompacted = false;
   }
-}
-
-void checkSwitch() {
-  //Serial.println(analogRead(switchIn));
-  switched = analogRead(switchIn > 1010) ? true : false;
-  //Serial.println(switched);
 }
 
 void checkDistance() {
   distance = analogRead(distPin);
   if (distance > 350) {
-    analogWrite(led, 255);
+    digitalWrite(led, HIGH);
   } else {
-    analogWrite(led, 0);
+    digitalWrite(led, LOW);
   }
 }
 
